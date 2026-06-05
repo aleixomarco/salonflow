@@ -15,20 +15,15 @@ const DAYS = [
   { key: "sunday",    label: "Sonntag" },
 ];
 
-const DEFAULT_HOURS = {
-  monday:    { open: true,  from: "09:00", to: "18:00" },
-  tuesday:   { open: true,  from: "09:00", to: "18:00" },
-  wednesday: { open: true,  from: "09:00", to: "18:00" },
-  thursday:  { open: true,  from: "09:00", to: "18:00" },
-  friday:    { open: true,  from: "09:00", to: "18:00" },
-  saturday:  { open: true,  from: "10:00", to: "16:00" },
-  sunday:    { open: false, from: "09:00", to: "18:00" },
+type TimeBlock = { from: string; to: string };
+
+type DayConfig = {
+  open: boolean;
+  blocks: TimeBlock[];
 };
 
-type DayKey = keyof typeof DEFAULT_HOURS;
-
 type WorkingHours = {
-  [key in DayKey]: { open: boolean; from: string; to: string };
+  [key: string]: DayConfig;
 };
 
 type BlockedSlot = {
@@ -37,6 +32,16 @@ type BlockedSlot = {
   date: string;
   from?: string;
   to?: string;
+};
+
+const DEFAULT_HOURS: WorkingHours = {
+  monday:    { open: true,  blocks: [{ from: "09:00", to: "18:00" }] },
+  tuesday:   { open: true,  blocks: [{ from: "09:00", to: "18:00" }] },
+  wednesday: { open: true,  blocks: [{ from: "09:00", to: "18:00" }] },
+  thursday:  { open: true,  blocks: [{ from: "09:00", to: "18:00" }] },
+  friday:    { open: true,  blocks: [{ from: "09:00", to: "18:00" }] },
+  saturday:  { open: true,  blocks: [{ from: "10:00", to: "16:00" }] },
+  sunday:    { open: false, blocks: [{ from: "09:00", to: "18:00" }] },
 };
 
 export default function BarberSettingsPage() {
@@ -81,11 +86,36 @@ export default function BarberSettingsPage() {
     load();
   }, [router]);
 
-  function updateDay(day: DayKey, field: "open" | "from" | "to", value: string | boolean) {
+  function toggleDay(key: string) {
     setWorkingHours((prev) => ({
       ...prev,
-      [day]: { ...prev[day], [field]: value },
+      [key]: { ...prev[key], open: !prev[key].open },
     }));
+  }
+
+  function updateBlock(day: string, index: number, field: "from" | "to", value: string) {
+    setWorkingHours((prev) => {
+      const blocks = [...prev[day].blocks];
+      blocks[index] = { ...blocks[index], [field]: value };
+      return { ...prev, [day]: { ...prev[day], blocks } };
+    });
+  }
+
+  function addBlock(day: string) {
+    setWorkingHours((prev) => ({
+      ...prev,
+      [day]: {
+        ...prev[day],
+        blocks: [...prev[day].blocks, { from: "09:00", to: "18:00" }],
+      },
+    }));
+  }
+
+  function removeBlock(day: string, index: number) {
+    setWorkingHours((prev) => {
+      const blocks = prev[day].blocks.filter((_, i) => i !== index);
+      return { ...prev, [day]: { ...prev[day], blocks } };
+    });
   }
 
   function addBlockedSlot() {
@@ -116,12 +146,10 @@ export default function BarberSettingsPage() {
     const { data: sessionData } = await supabase.auth.getSession();
     if (!sessionData.session) return;
 
-    const userId = sessionData.session.user.id;
-
     const { error } = await supabase
       .from("salon_settings")
       .upsert({
-        user_id: userId,
+        user_id: sessionData.session.user.id,
         slot_duration: slotDuration,
         working_hours: workingHours,
         blocked_slots: blockedSlots,
@@ -154,13 +182,14 @@ export default function BarberSettingsPage() {
       <div style={styles.glowTwo}></div>
 
       <section style={styles.appShell}>
+
+        {/* Status Bar */}
         <div style={styles.statusBar}>
-          <Link href="/barber" style={styles.statusLink}>
-            ← Dashboard
-          </Link>
+          <Link href="/barber" style={styles.statusLink}>← Dashboard</Link>
           <span>SalonFlow</span>
         </div>
 
+        {/* Hero */}
         <div style={styles.heroCard}>
           <div style={styles.appIcon}>⚙︎</div>
           <p style={styles.badge}>Barber-Einstellungen</p>
@@ -170,13 +199,14 @@ export default function BarberSettingsPage() {
             Kalender.
           </h1>
           <p style={styles.text}>
-            Lege deinen Buchungsrhythmus und deine Arbeitszeiten fest.
+            Lege deinen Buchungsrhythmus, Arbeitszeiten und Ausnahmen fest.
           </p>
         </div>
 
         {/* Slot-Dauer */}
         <div style={styles.section}>
           <h2 style={styles.sectionTitle}>Minuten pro Slot</h2>
+          <p style={styles.sectionSub}>Wie lange dauert ein Termin bei dir?</p>
           <div style={styles.slotGrid}>
             {([10, 15, 20] as const).map((val) => (
               <button
@@ -187,7 +217,8 @@ export default function BarberSettingsPage() {
                 }}
                 onClick={() => setSlotDuration(val)}
               >
-                {val} min
+                <span style={{ fontSize: "22px", fontWeight: 950 }}>{val}</span>
+                <span style={{ fontSize: "12px", opacity: 0.7 }}>min</span>
               </button>
             ))}
           </div>
@@ -196,39 +227,67 @@ export default function BarberSettingsPage() {
         {/* Arbeitszeiten */}
         <div style={styles.section}>
           <h2 style={styles.sectionTitle}>Arbeitszeiten</h2>
+          <p style={styles.sectionSub}>Mehrere Zeitblöcke pro Tag möglich.</p>
+
           <div style={styles.dayGrid}>
             {DAYS.map(({ key, label }) => {
-              const day = workingHours[key as DayKey];
+              const day = workingHours[key];
               return (
-                <div key={key} style={styles.dayRow}>
-                  <div style={styles.dayLeft}>
+                <div key={key} style={styles.dayCard}>
+
+                  {/* Tag-Header */}
+                  <div style={styles.dayHeader}>
+                    <span style={styles.dayLabel}>{label}</span>
                     <button
                       style={{
                         ...styles.toggleButton,
                         ...(day.open ? styles.toggleOn : styles.toggleOff),
                       }}
-                      onClick={() => updateDay(key as DayKey, "open", !day.open)}
+                      onClick={() => toggleDay(key)}
                     >
-                      {day.open ? "Offen" : "Zu"}
+                      {day.open ? "Geöffnet" : "Geschlossen"}
                     </button>
-                    <span style={styles.dayLabel}>{label}</span>
                   </div>
 
                   {day.open && (
-                    <div style={styles.dayRight}>
-                      <input
-                        type="time"
-                        style={styles.timeInput}
-                        value={day.from}
-                        onChange={(e) => updateDay(key as DayKey, "from", e.target.value)}
-                      />
-                      <span style={styles.timeSep}>–</span>
-                      <input
-                        type="time"
-                        style={styles.timeInput}
-                        value={day.to}
-                        onChange={(e) => updateDay(key as DayKey, "to", e.target.value)}
-                      />
+                    <div style={styles.blocksArea}>
+                      {day.blocks.map((block, index) => (
+                        <div key={index} style={styles.blockRow}>
+                          <div style={styles.blockBadge}>{index + 1}</div>
+
+                          <div style={styles.timeRow}>
+                            <input
+                              type="time"
+                              style={styles.timeInput}
+                              value={block.from}
+                              onChange={(e) => updateBlock(key, index, "from", e.target.value)}
+                            />
+                            <span style={styles.timeSep}>–</span>
+                            <input
+                              type="time"
+                              style={styles.timeInput}
+                              value={block.to}
+                              onChange={(e) => updateBlock(key, index, "to", e.target.value)}
+                            />
+                          </div>
+
+                          {day.blocks.length > 1 && (
+                            <button
+                              style={styles.removeBlockButton}
+                              onClick={() => removeBlock(key, index)}
+                            >
+                              ✕
+                            </button>
+                          )}
+                        </div>
+                      ))}
+
+                      <button
+                        style={styles.addBlockButton}
+                        onClick={() => addBlock(key)}
+                      >
+                        + Zeitblock hinzufügen
+                      </button>
                     </div>
                   )}
                 </div>
@@ -237,9 +296,10 @@ export default function BarberSettingsPage() {
           </div>
         </div>
 
-        {/* Geblockte Tage / Stunden */}
+        {/* Geblockte Zeiten */}
         <div style={styles.section}>
           <h2 style={styles.sectionTitle}>Geblockte Zeiten</h2>
+          <p style={styles.sectionSub}>Urlaub, Feiertage oder einzelne Stunden sperren.</p>
 
           <div style={styles.blockForm}>
             <div style={styles.blockTypeRow}>
@@ -272,17 +332,17 @@ export default function BarberSettingsPage() {
             />
 
             {newBlockType === "hour" && (
-              <div style={styles.dayRight}>
+              <div style={styles.timeRow}>
                 <input
                   type="time"
-                  style={styles.timeInput}
+                  style={{ ...styles.timeInput, flex: 1, width: "auto" }}
                   value={newBlockFrom}
                   onChange={(e) => setNewBlockFrom(e.target.value)}
                 />
                 <span style={styles.timeSep}>–</span>
                 <input
                   type="time"
-                  style={styles.timeInput}
+                  style={{ ...styles.timeInput, flex: 1, width: "auto" }}
                   value={newBlockTo}
                   onChange={(e) => setNewBlockTo(e.target.value)}
                 />
@@ -348,6 +408,7 @@ export default function BarberSettingsPage() {
         >
           {isSaving ? "Wird gespeichert..." : "Einstellungen speichern"}
         </button>
+
       </section>
     </main>
   );
@@ -438,16 +499,22 @@ const styles = {
   },
   section: {
     marginTop: "16px",
-    padding: "20px",
+    padding: "22px",
     borderRadius: "32px",
     background: "rgba(255,255,255,0.07)",
     border: "1px solid rgba(255,255,255,0.10)",
   },
   sectionTitle: {
-    margin: "0 0 14px",
-    fontSize: "20px",
-    letterSpacing: "-0.03em",
+    margin: "0 0 4px",
+    fontSize: "22px",
+    letterSpacing: "-0.04em",
     color: "#fffaf0",
+  },
+  sectionSub: {
+    margin: "0 0 16px",
+    fontSize: "13px",
+    color: "rgba(255,250,240,0.45)",
+    fontWeight: 700,
   },
   slotGrid: {
     display: "grid",
@@ -455,14 +522,18 @@ const styles = {
     gap: "10px",
   },
   slotButton: {
-    padding: "12px",
-    borderRadius: "999px",
-    border: "1px solid rgba(255,255,255,0.12)",
-    background: "rgba(255,255,255,0.08)",
+    padding: "16px 12px",
+    borderRadius: "20px",
+    border: "1px solid rgba(255,255,255,0.10)",
+    background: "rgba(255,255,255,0.07)",
     color: "rgba(255,250,240,0.72)",
     fontWeight: 900,
     fontSize: "14px",
     cursor: "pointer",
+    display: "flex",
+    flexDirection: "column" as const,
+    alignItems: "center",
+    gap: "2px",
   },
   slotButtonActive: {
     background: "linear-gradient(135deg, #d4af37 0%, #fff1a6 50%, #b8860b 100%)",
@@ -473,33 +544,26 @@ const styles = {
     display: "grid",
     gap: "10px",
   },
-  dayRow: {
+  dayCard: {
+    borderRadius: "22px",
+    background: "rgba(255,255,255,0.05)",
+    border: "1px solid rgba(255,255,255,0.09)",
+    overflow: "hidden",
+  },
+  dayHeader: {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    gap: "10px",
-    padding: "12px 14px",
-    borderRadius: "18px",
-    background: "rgba(255,255,255,0.06)",
-    border: "1px solid rgba(255,255,255,0.08)",
-  },
-  dayLeft: {
-    display: "flex",
-    alignItems: "center",
-    gap: "10px",
+    padding: "16px 18px",
   },
   dayLabel: {
-    fontSize: "14px",
-    fontWeight: 800,
+    fontSize: "16px",
+    fontWeight: 900,
     color: "#fffaf0",
-  },
-  dayRight: {
-    display: "flex",
-    alignItems: "center",
-    gap: "6px",
+    letterSpacing: "-0.02em",
   },
   toggleButton: {
-    padding: "6px 12px",
+    padding: "7px 14px",
     borderRadius: "999px",
     border: 0,
     fontWeight: 900,
@@ -511,22 +575,80 @@ const styles = {
     color: "#86efac",
   },
   toggleOff: {
-    background: "rgba(255,255,255,0.10)",
-    color: "rgba(255,250,240,0.45)",
+    background: "rgba(255,255,255,0.08)",
+    color: "rgba(255,250,240,0.35)",
+  },
+  blocksArea: {
+    padding: "0 18px 16px",
+    display: "grid",
+    gap: "8px",
+    borderTop: "1px solid rgba(255,255,255,0.07)",
+    paddingTop: "14px",
+  },
+  blockRow: {
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+  },
+  blockBadge: {
+    width: "24px",
+    height: "24px",
+    borderRadius: "8px",
+    background: "rgba(212,175,55,0.18)",
+    color: "#fff1a6",
+    fontSize: "11px",
+    fontWeight: 950,
+    display: "grid",
+    placeItems: "center",
+    flexShrink: 0,
+  },
+  timeRow: {
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    flex: 1,
   },
   timeInput: {
-    padding: "8px 10px",
+    padding: "9px 8px",
     borderRadius: "12px",
-    border: "1px solid rgba(255,255,255,0.12)",
+    border: "1px solid rgba(255,255,255,0.10)",
     background: "rgba(255,255,255,0.08)",
     color: "#fffaf0",
     fontSize: "13px",
     fontWeight: 800,
-    width: "88px",
+    flex: 1,
+    minWidth: 0,
   },
   timeSep: {
-    color: "rgba(255,250,240,0.45)",
+    color: "rgba(255,250,240,0.35)",
     fontWeight: 900,
+    fontSize: "14px",
+    flexShrink: 0,
+  },
+  removeBlockButton: {
+    width: "28px",
+    height: "28px",
+    borderRadius: "999px",
+    border: 0,
+    background: "rgba(239,68,68,0.16)",
+    color: "#fecaca",
+    fontWeight: 900,
+    fontSize: "11px",
+    cursor: "pointer",
+    flexShrink: 0,
+    display: "grid",
+    placeItems: "center",
+  },
+  addBlockButton: {
+    padding: "10px",
+    borderRadius: "14px",
+    border: "1px dashed rgba(212,175,55,0.25)",
+    background: "transparent",
+    color: "rgba(255,241,166,0.55)",
+    fontWeight: 900,
+    fontSize: "13px",
+    cursor: "pointer",
+    marginTop: "2px",
   },
   blockForm: {
     display: "grid",
@@ -541,8 +663,8 @@ const styles = {
     width: "100%",
     padding: "14px 16px",
     borderRadius: "18px",
-    border: "1px solid rgba(255,255,255,0.12)",
-    background: "rgba(255,255,255,0.08)",
+    border: "1px solid rgba(255,255,255,0.10)",
+    background: "rgba(255,255,255,0.07)",
     color: "#fffaf0",
     fontSize: "15px",
     outline: "none",
@@ -552,7 +674,7 @@ const styles = {
     padding: "13px",
     borderRadius: "999px",
     border: "1px solid rgba(212,175,55,0.30)",
-    background: "rgba(212,175,55,0.12)",
+    background: "rgba(212,175,55,0.10)",
     color: "#fff1a6",
     fontWeight: 950,
     fontSize: "14px",
@@ -569,26 +691,27 @@ const styles = {
     justifyContent: "space-between",
     padding: "12px 14px",
     borderRadius: "18px",
-    background: "rgba(239,68,68,0.10)",
-    border: "1px solid rgba(239,68,68,0.18)",
+    background: "rgba(239,68,68,0.08)",
+    border: "1px solid rgba(239,68,68,0.16)",
   },
   blockedDate: {
     color: "#fffaf0",
     fontSize: "14px",
   },
   blockedType: {
-    color: "rgba(255,250,240,0.55)",
+    color: "rgba(255,250,240,0.50)",
     fontSize: "13px",
   },
   removeButton: {
     padding: "7px 12px",
     borderRadius: "999px",
     border: 0,
-    background: "rgba(239,68,68,0.20)",
+    background: "rgba(239,68,68,0.18)",
     color: "#fecaca",
     fontWeight: 900,
     fontSize: "12px",
     cursor: "pointer",
+    flexShrink: 0,
   },
   messageBox: {
     marginTop: "16px",
@@ -600,6 +723,7 @@ const styles = {
   saveButton: {
     width: "100%",
     marginTop: "16px",
+    marginBottom: "8px",
     padding: "16px 22px",
     borderRadius: "999px",
     border: 0,
@@ -609,7 +733,6 @@ const styles = {
     fontWeight: 950,
     fontSize: "16px",
     boxShadow: "0 18px 50px rgba(212,175,55,0.25)",
-    marginBottom: "8px",
   },
   empty: {
     padding: "40px",
