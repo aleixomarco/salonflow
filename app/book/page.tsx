@@ -41,15 +41,12 @@ function getOpeningTimes(dateString: string) {
   const selectedDate = new Date(dateString + "T00:00:00");
   const day = selectedDate.getDay();
 
-  // 0 = Sonntag
   if (day === 0) return [];
 
-  // Montag bis Freitag: 09:00–18:00
   if (day >= 1 && day <= 5) {
     return createTimeOptions(9, 18);
   }
 
-  // Samstag: 10:00–16:00
   if (day === 6) {
     return createTimeOptions(10, 16);
   }
@@ -71,6 +68,7 @@ function formatDate(dateString: string) {
 
 export default function BookPage() {
   const router = useRouter();
+
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [service, setService] = useState("");
@@ -163,45 +161,57 @@ export default function BookPage() {
     }
 
     setName("");
-setPhone("");
-setService("");
-setDate("");
-setTime("");
-setBookedAppointments([]);
+    setPhone("");
+    setService("");
+    setDate("");
+    setTime("");
+    setBookedAppointments([]);
 
-router.push("/success");
+    router.push("/success");
   }
 
   return (
     <main style={styles.page}>
-      <div style={styles.top}>
-        <Link href="/" style={styles.back}>
-          ← Zurück
-        </Link>
+      <div style={styles.glowOne}></div>
+      <div style={styles.glowTwo}></div>
 
-        <Link href="/status" style={styles.back}>
-          Status ansehen
-        </Link>
-      </div>
+      <section style={styles.appShell}>
+        <div style={styles.statusBar}>
+          <Link href="/" style={styles.statusLink}>
+            ← Home
+          </Link>
 
-      <section style={styles.card}>
-        <p style={styles.badge}>Kundensicht</p>
+          <span>SalonFlow</span>
+        </div>
 
-        <h1 style={styles.title}>Termin anfragen</h1>
+        <div style={styles.heroCard}>
+          <div style={styles.appIcon}>✂︎</div>
 
-        <p style={styles.text}>
-          Wähle Leistung, Datum und freie Uhrzeit. Der Termin ist erst bestätigt,
-          wenn der Barber ihn akzeptiert.
-        </p>
+          <p style={styles.badge}>Buchung</p>
+
+          <h1 style={styles.title}>
+            Termin
+            <br />
+            anfragen.
+          </h1>
+
+          <p style={styles.text}>
+            Wähle den Service, Datum und freie Uhrzeit. Dein Termin ist erst bestätigt,
+            wenn der Barber ihn annimmt. 
+            <br />
+            Du kannst den Status deiner Anfrage jederzeit in der App verfolgen.
+          </p>
+        </div>
 
         <div style={styles.infoBox}>
-          <strong>Öffnungszeiten:</strong>
-          <br />
-          Montag bis Freitag: 09:00–18:00 Uhr
-          <br />
-          Samstag: 10:00–16:00 Uhr
-          <br />
-          Sonntag: geschlossen
+          <strong>Öffnungszeiten</strong>
+          <p>
+            Mo–Fr: 09:00–18:00 Uhr
+            <br />
+            Sa: 10:00–16:00 Uhr
+            <br />
+            So: geschlossen
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} style={styles.form}>
@@ -292,12 +302,14 @@ router.push("/success");
           {date && (
             <div style={styles.slotInfo}>
               <strong>{formatDate(date)}</strong>
-              <br />
-              {isLoadingTimes
-                ? "Freie Zeiten werden geprüft..."
-                : allTimes.length === 0
-                ? "Der Salon ist an diesem Tag geschlossen."
-                : `${availableTimes.length} freie Uhrzeiten verfügbar.`}
+
+              <span>
+                {isLoadingTimes
+                  ? "Freie Zeiten werden geprüft..."
+                  : allTimes.length === 0
+                  ? "Der Salon ist an diesem Tag geschlossen."
+                  : `${availableTimes.length} freie Uhrzeiten verfügbar.`}
+              </span>
             </div>
           )}
 
@@ -321,85 +333,176 @@ router.push("/success");
 const styles = {
   page: {
     minHeight: "100vh",
-    background: "#f5f5f7",
-    padding: "32px",
+    background:
+      "radial-gradient(circle at 50% 0%, rgba(212,175,55,0.18), transparent 34%), linear-gradient(180deg, #08080b 0%, #111116 100%)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "24px",
     fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+    color: "#fff",
+    position: "relative" as const,
+    overflow: "hidden",
   },
-  top: {
-    maxWidth: "760px",
-    margin: "0 auto 20px",
+
+  appShell: {
+    position: "relative" as const,
+    zIndex: 2,
+    width: "min(430px, 100%)",
+    maxHeight: "calc(100vh - 48px)",
+    overflowY: "auto" as const,
+    borderRadius: "46px",
+    background:
+      "linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.05))",
+    border: "1px solid rgba(255,255,255,0.16)",
+    boxShadow: "0 40px 140px rgba(0,0,0,0.45)",
+    padding: "22px",
+    backdropFilter: "blur(30px)",
+  },
+
+  statusBar: {
     display: "flex",
     justifyContent: "space-between",
-    gap: "14px",
+    color: "rgba(255,255,255,0.72)",
+    fontSize: "13px",
+    fontWeight: 800,
+    marginBottom: "18px",
   },
-  back: {
-    color: "#0071e3",
+
+  statusLink: {
+    color: "rgba(255,255,255,0.72)",
     textDecoration: "none",
-    fontWeight: 700,
   },
-  card: {
-    maxWidth: "760px",
-    margin: "0 auto",
-    background: "#fff",
+
+  heroCard: {
     borderRadius: "34px",
-    padding: "34px",
-    boxShadow: "0 24px 80px rgba(0,0,0,0.08)",
+    padding: "30px 24px",
+    background:
+      "radial-gradient(circle at 80% 0%, rgba(212,175,55,0.28), transparent 36%), #15151d",
+    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.10)",
   },
+
+  appIcon: {
+    width: "66px",
+    height: "66px",
+    borderRadius: "22px",
+    display: "grid",
+    placeItems: "center",
+    background:
+      "linear-gradient(135deg, #d4af37 0%, #fff1a6 55%, #b8860b 100%)",
+    color: "#08080b",
+    fontSize: "30px",
+    fontWeight: 950,
+    marginBottom: "24px",
+  },
+
   badge: {
-    color: "#25d366",
-    fontWeight: 900,
     margin: 0,
+    color: "#d4af37",
+    fontSize: "13px",
+    fontWeight: 950,
+    letterSpacing: "0.04em",
+    textTransform: "uppercase" as const,
   },
+
   title: {
-    fontSize: "52px",
-    letterSpacing: "-0.06em",
-    margin: "10px 0 12px",
-    lineHeight: 1,
+    margin: "12px 0 0",
+    fontSize: "48px",
+    lineHeight: "0.92",
+    letterSpacing: "-0.065em",
+    color: "#fffaf0",
   },
+
   text: {
-    color: "#6e6e73",
-    fontSize: "18px",
+    margin: "20px 0 0",
+    color: "rgba(255,250,240,0.75)",
+    fontSize: "17px",
+    lineHeight: 1.45,
+    fontWeight: 600,
+  },
+
+  infoBox: {
+    marginTop: "16px",
+    padding: "18px",
+    borderRadius: "28px",
+    background: "rgba(255,255,255,0.09)",
+    border: "1px solid rgba(255,255,255,0.10)",
+    color: "#fffaf0",
     lineHeight: 1.5,
   },
-  infoBox: {
-    marginTop: "22px",
-    padding: "18px",
-    borderRadius: "22px",
-    background: "#f5f5f7",
-    color: "#1d1d1f",
-    lineHeight: 1.6,
-  },
+
   form: {
     display: "grid",
-    gap: "18px",
-    marginTop: "28px",
+    gap: "14px",
+    marginTop: "16px",
+    padding: "18px",
+    borderRadius: "32px",
+    background: "rgba(255,255,255,0.09)",
+    border: "1px solid rgba(255,255,255,0.10)",
+    backdropFilter: "blur(20px)",
   },
+
   label: {
     display: "grid",
     gap: "8px",
-    fontWeight: 800,
+    color: "rgba(255,250,240,0.85)",
+    fontSize: "13px",
+    fontWeight: 900,
   },
+
   input: {
+    width: "100%",
     padding: "15px 16px",
     borderRadius: "18px",
-    border: "1px solid rgba(0,0,0,0.12)",
-    fontSize: "16px",
-    background: "#fff",
+    border: "1px solid rgba(255,255,255,0.12)",
+    background: "rgba(255,255,255,0.08)",
+    color: "#fffaf0",
+    fontSize: "15px",
+    outline: "none",
   },
+
   slotInfo: {
+    display: "grid",
+    gap: "6px",
     padding: "16px",
-    borderRadius: "20px",
-    background: "rgba(37, 211, 102, 0.10)",
-    color: "#0c5f2a",
+    borderRadius: "22px",
+    background: "rgba(212,175,55,0.16)",
+    color: "#fff1a6",
     lineHeight: 1.5,
+    fontWeight: 800,
   },
+
   button: {
     padding: "16px 22px",
     borderRadius: "999px",
     border: 0,
-    background: "#25d366",
-    color: "#fff",
-    fontWeight: 900,
+    background:
+      "linear-gradient(135deg, #d4af37 0%, #fff1a6 50%, #b8860b 100%)",
+    color: "#08080b",
+    fontWeight: 950,
     fontSize: "16px",
+    boxShadow: "0 18px 50px rgba(212,175,55,0.25)",
+  },
+
+  glowOne: {
+    position: "absolute" as const,
+    width: "420px",
+    height: "420px",
+    borderRadius: "50%",
+    background: "rgba(212,175,55,0.18)",
+    filter: "blur(80px)",
+    top: "-120px",
+    left: "20%",
+  },
+
+  glowTwo: {
+    position: "absolute" as const,
+    width: "360px",
+    height: "360px",
+    borderRadius: "50%",
+    background: "rgba(99,102,241,0.14)",
+    filter: "blur(80px)",
+    bottom: "-90px",
+    right: "18%",
   },
 };

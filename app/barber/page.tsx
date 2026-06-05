@@ -117,10 +117,7 @@ export default function BarberPage() {
     setIsUpdatingId(id);
     setMessage("");
 
-    const { error } = await supabase
-      .from("appointments")
-      .delete()
-      .eq("id", id);
+    const { error } = await supabase.from("appointments").delete().eq("id", id);
 
     setIsUpdatingId(null);
 
@@ -202,8 +199,13 @@ Bitte schreib uns kurz, damit wir gemeinsam eine passende Alternative finden.`
     (appointment) => appointment.status === "declined"
   );
 
+  const processedAppointments = [...confirmedAppointments, ...declinedAppointments];
+
   return (
     <main style={styles.page}>
+      <div style={styles.glowOne}></div>
+      <div style={styles.glowTwo}></div>
+
       {showDeleteOverlay && (
         <div style={styles.overlay}>
           <div style={styles.overlayCard}>
@@ -221,138 +223,150 @@ Bitte schreib uns kurz, damit wir gemeinsam eine passende Alternative finden.`
         </div>
       )}
 
-      <div style={styles.top}>
-        <Link href="/" style={styles.back}>
-          ← Zurück
-        </Link>
+      <section style={styles.appShell}>
+        <div style={styles.statusBar}>
+          <Link href="/" style={styles.statusLink}>
+            ← Home
+          </Link>
 
-        <Link href="/book" style={styles.back}>
-          Kundensicht öffnen
-        </Link>
-      </div>
-
-      <section style={styles.headerCard}>
-        <p style={styles.badge}>Barber-Sicht</p>
-
-        <h1 style={styles.title}>Dashboard</h1>
-
-        <p style={styles.text}>
-          Bestätige oder lehne Terminanfragen ab. Danach verschwindet die Anfrage
-          aus den offenen Anfragen und der Kunde kann den Status sehen.
-        </p>
-
-        <div style={styles.stats}>
-          <div style={styles.statBox}>
-            <span>Offen</span>
-            <strong>{pendingAppointments.length}</strong>
-          </div>
-
-          <div style={styles.statBox}>
-            <span>Bestätigt</span>
-            <strong>{confirmedAppointments.length}</strong>
-          </div>
-
-          <div style={styles.statBox}>
-            <span>Abgelehnt</span>
-            <strong>{declinedAppointments.length}</strong>
-          </div>
-
-          <div style={styles.statBox}>
-            <span>Gesamt</span>
-            <strong>{appointments.length}</strong>
-          </div>
+          <span>SalonFlow</span>
         </div>
 
-        {message && <div style={styles.messageBox}>{message}</div>}
+        <div style={styles.heroCard}>
+          <div style={styles.appIcon}>◆</div>
 
-        <div style={styles.headerActions}>
-          <button style={styles.refreshButton} onClick={loadAppointments}>
-            Neu laden
-          </button>
+          <p style={styles.badge}>Barber-Sicht</p>
 
-          <button style={styles.logoutButton} onClick={handleLogout}>
-            Ausloggen
-          </button>
+          <h1 style={styles.title}>
+            Barber
+            <br />
+            Dashboard.
+          </h1>
+
+          <p style={styles.text}>
+            Bestätige oder lehne Terminanfragen ab und kontaktiere Kunden direkt
+            per WhatsApp.
+          </p>
+
+          <div style={styles.stats}>
+            <div style={styles.statBox}>
+              <span>Offen</span>
+              <strong>{pendingAppointments.length}</strong>
+            </div>
+
+            <div style={styles.statBox}>
+              <span>Bestätigt</span>
+              <strong>{confirmedAppointments.length}</strong>
+            </div>
+
+            <div style={styles.statBox}>
+              <span>Abgelehnt</span>
+              <strong>{declinedAppointments.length}</strong>
+            </div>
+          </div>
+
+          {message && <div style={styles.messageBox}>{message}</div>}
+
+          <div style={styles.headerActions}>
+  <button style={styles.refreshButton} onClick={loadAppointments}>
+    Neu laden
+  </button>
+
+  <Link href="/barber/settings" style={{
+    flex: 1,
+    border: "1px solid rgba(255,255,255,0.12)",
+    borderRadius: "999px",
+    padding: "13px 14px",
+    background: "rgba(255,255,255,0.10)",
+    color: "#fffaf0",
+    fontWeight: 950,
+    cursor: "pointer",
+    textDecoration: "none",
+    textAlign: "center" as const,
+    fontSize: "14px",
+    display: "block",
+  }}>
+    Einstellungen
+  </Link>
+
+  <button style={styles.logoutButton} onClick={handleLogout}>
+    Ausloggen
+  </button>
+</div>
         </div>
-      </section>
 
-      <section style={styles.list}>
-        <h2 style={styles.sectionHeadline}>Offene Anfragen</h2>
+        <section style={styles.list}>
+          <h2 style={styles.sectionHeadline}>Offene Anfragen</h2>
 
-        {isLoading ? (
-          <div style={styles.empty}>Termine werden geladen...</div>
-        ) : pendingAppointments.length === 0 ? (
-          <div style={styles.empty}>Keine offenen Terminanfragen.</div>
-        ) : (
-          pendingAppointments.map((appointment) => (
-            <article key={appointment.id} style={styles.appointmentCard}>
-              <div>
-                <strong style={styles.appointmentTitle}>
-                  {appointment.name}
-                </strong>
-
-                <p style={styles.appointmentText}>
-                  {appointment.service}
-                  <br />
-                  {formatDate(appointment.date)} · {appointment.time} Uhr
-                  <br />
-                  Telefon: {appointment.phone}
-                </p>
-
-                <span style={styles.pendingStatus}>Offen</span>
-              </div>
-
-              <div style={styles.actions}>
-                <button
-                  style={styles.confirm}
-                  disabled={isUpdatingId === appointment.id}
-                  onClick={() => handleDecision(appointment, "confirmed")}
-                >
-                  {isUpdatingId === appointment.id
-                    ? "Speichert..."
-                    : "Bestätigen"}
-                </button>
-
-                <button
-                  style={styles.decline}
-                  disabled={isUpdatingId === appointment.id}
-                  onClick={() => handleDecision(appointment, "declined")}
-                >
-                  {isUpdatingId === appointment.id
-                    ? "Speichert..."
-                    : "Ablehnen"}
-                </button>
-
-                <button
-                  style={styles.delete}
-                  disabled={isUpdatingId === appointment.id}
-                  onClick={() => deleteAppointment(appointment.id)}
-                >
-                  {isUpdatingId === appointment.id ? "Löscht..." : "Löschen"}
-                </button>
-              </div>
-            </article>
-          ))
-        )}
-      </section>
-
-      <section style={styles.list}>
-        <h2 style={styles.sectionHeadline}>Bearbeitete Anfragen</h2>
-
-        {[...confirmedAppointments, ...declinedAppointments].length === 0 ? (
-          <div style={styles.empty}>Noch keine bearbeiteten Anfragen.</div>
-        ) : (
-          [...confirmedAppointments, ...declinedAppointments].map(
-            (appointment) => (
+          {isLoading ? (
+            <div style={styles.empty}>Termine werden geladen...</div>
+          ) : pendingAppointments.length === 0 ? (
+            <div style={styles.empty}>Keine offenen Terminanfragen.</div>
+          ) : (
+            pendingAppointments.map((appointment) => (
               <article key={appointment.id} style={styles.appointmentCard}>
                 <div>
+                  <span style={styles.serviceBadge}>{appointment.service}</span>
+
                   <strong style={styles.appointmentTitle}>
                     {appointment.name}
                   </strong>
 
                   <p style={styles.appointmentText}>
-                    {appointment.service}
+                    {formatDate(appointment.date)} · {appointment.time} Uhr
                     <br />
+                    Telefon: {appointment.phone}
+                  </p>
+
+                  <span style={styles.pendingStatus}>Offen</span>
+                </div>
+
+                <div style={styles.actions}>
+                  <button
+                    style={styles.confirm}
+                    disabled={isUpdatingId === appointment.id}
+                    onClick={() => handleDecision(appointment, "confirmed")}
+                  >
+                    {isUpdatingId === appointment.id ? "Speichert..." : "Bestätigen"}
+                  </button>
+
+                  <button
+                    style={styles.decline}
+                    disabled={isUpdatingId === appointment.id}
+                    onClick={() => handleDecision(appointment, "declined")}
+                  >
+                    {isUpdatingId === appointment.id ? "Speichert..." : "Ablehnen"}
+                  </button>
+
+                  <button
+                    style={styles.delete}
+                    disabled={isUpdatingId === appointment.id}
+                    onClick={() => deleteAppointment(appointment.id)}
+                  >
+                    {isUpdatingId === appointment.id ? "Löscht..." : "Löschen"}
+                  </button>
+                </div>
+              </article>
+            ))
+          )}
+        </section>
+
+        <section style={styles.list}>
+          <h2 style={styles.sectionHeadline}>Bearbeitet</h2>
+
+          {processedAppointments.length === 0 ? (
+            <div style={styles.empty}>Noch keine bearbeiteten Anfragen.</div>
+          ) : (
+            processedAppointments.map((appointment) => (
+              <article key={appointment.id} style={styles.appointmentCard}>
+                <div>
+                  <span style={styles.serviceBadge}>{appointment.service}</span>
+
+                  <strong style={styles.appointmentTitle}>
+                    {appointment.name}
+                  </strong>
+
+                  <p style={styles.appointmentText}>
                     {formatDate(appointment.date)} · {appointment.time} Uhr
                     <br />
                     Telefon: {appointment.phone}
@@ -365,9 +379,7 @@ Bitte schreib uns kurz, damit wir gemeinsam eine passende Alternative finden.`
                         : styles.declinedStatus
                     }
                   >
-                    {appointment.status === "confirmed"
-                      ? "Bestätigt"
-                      : "Abgelehnt"}
+                    {appointment.status === "confirmed" ? "Bestätigt" : "Abgelehnt"}
                   </span>
                 </div>
 
@@ -380,7 +392,7 @@ Bitte schreib uns kurz, damit wir gemeinsam eine passende Alternative finden.`
                         : openWhatsAppDecline(appointment)
                     }
                   >
-                    WhatsApp erneut
+                    WhatsApp
                   </button>
 
                   <button
@@ -392,9 +404,9 @@ Bitte schreib uns kurz, damit wir gemeinsam eine passende Alternative finden.`
                   </button>
                 </div>
               </article>
-            )
-          )
-        )}
+            ))
+          )}
+        </section>
       </section>
     </main>
   );
@@ -403,192 +415,285 @@ Bitte schreib uns kurz, damit wir gemeinsam eine passende Alternative finden.`
 const styles = {
   page: {
     minHeight: "100vh",
-    background: "#f5f5f7",
-    padding: "32px",
+    background:
+      "radial-gradient(circle at 50% 0%, rgba(212,175,55,0.18), transparent 34%), linear-gradient(180deg, #08080b 0%, #111116 100%)",
+    display: "flex",
+    alignItems: "flex-start",
+    justifyContent: "center",
+    padding: "24px",
     fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+    color: "#fff",
+    position: "relative" as const,
+    overflowX: "hidden" as const,
   },
-  top: {
-    maxWidth: "980px",
-    margin: "0 auto 20px",
+
+  appShell: {
+    position: "relative" as const,
+    zIndex: 2,
+    width: "min(430px, 100%)",
+    maxHeight: "calc(100vh - 48px)",
+    overflowY: "auto" as const,
+    borderRadius: "46px",
+    background:
+      "linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.05))",
+    border: "1px solid rgba(255,255,255,0.16)",
+    boxShadow: "0 40px 140px rgba(0,0,0,0.45)",
+    padding: "22px",
+    backdropFilter: "blur(30px)",
+  },
+
+  statusBar: {
     display: "flex",
     justifyContent: "space-between",
-    gap: "14px",
+    color: "rgba(255,255,255,0.72)",
+    fontSize: "13px",
+    fontWeight: 800,
+    marginBottom: "18px",
   },
-  back: {
-    color: "#0071e3",
+
+  statusLink: {
+    color: "rgba(255,255,255,0.72)",
     textDecoration: "none",
-    fontWeight: 700,
   },
-  headerCard: {
-    maxWidth: "980px",
-    margin: "0 auto 20px",
-    background: "#fff",
+
+  heroCard: {
     borderRadius: "34px",
-    padding: "34px",
-    boxShadow: "0 24px 80px rgba(0,0,0,0.08)",
+    padding: "30px 24px",
+    background:
+      "radial-gradient(circle at 80% 0%, rgba(212,175,55,0.28), transparent 36%), #15151d",
+    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.10)",
   },
+
+  appIcon: {
+    width: "66px",
+    height: "66px",
+    borderRadius: "22px",
+    display: "grid",
+    placeItems: "center",
+    background:
+      "linear-gradient(135deg, #d4af37 0%, #fff1a6 55%, #b8860b 100%)",
+    color: "#08080b",
+    fontSize: "30px",
+    fontWeight: 950,
+    marginBottom: "24px",
+  },
+
   badge: {
-    color: "#0071e3",
-    fontWeight: 900,
     margin: 0,
+    color: "#d4af37",
+    fontSize: "13px",
+    fontWeight: 950,
+    letterSpacing: "0.04em",
+    textTransform: "uppercase" as const,
   },
+
   title: {
-    fontSize: "52px",
-    letterSpacing: "-0.06em",
-    margin: "10px 0 12px",
-    lineHeight: 1,
+    margin: "12px 0 0",
+    fontSize: "48px",
+    lineHeight: "0.92",
+    letterSpacing: "-0.065em",
+    color: "#fffaf0",
   },
+
   text: {
-    color: "#6e6e73",
-    fontSize: "18px",
-    lineHeight: 1.5,
+    margin: "20px 0 0",
+    color: "rgba(255,250,240,0.75)",
+    fontSize: "17px",
+    lineHeight: 1.45,
+    fontWeight: 600,
   },
+
   stats: {
     display: "grid",
-    gridTemplateColumns: "repeat(4, 1fr)",
-    gap: "12px",
-    marginTop: "26px",
+    gridTemplateColumns: "repeat(3, 1fr)",
+    gap: "10px",
+    marginTop: "22px",
   },
+
   statBox: {
-    background: "#f5f5f7",
+    padding: "14px",
     borderRadius: "22px",
-    padding: "18px",
+    background: "rgba(255,255,255,0.09)",
+    border: "1px solid rgba(255,255,255,0.10)",
+    display: "grid",
+    gap: "6px",
+    color: "#fffaf0",
   },
+
   messageBox: {
-    marginTop: "20px",
-    padding: "16px",
+    marginTop: "16px",
+    padding: "14px",
     borderRadius: "20px",
-    background: "rgba(37, 211, 102, 0.12)",
-    color: "#0c5f2a",
+    background: "rgba(37,211,102,0.14)",
+    color: "#86efac",
     fontWeight: 800,
+    lineHeight: 1.4,
   },
+
   headerActions: {
     display: "flex",
-    gap: "12px",
-    flexWrap: "wrap" as const,
-    marginTop: "20px",
+    gap: "10px",
+    marginTop: "16px",
   },
+
   refreshButton: {
+    flex: 1,
     border: 0,
     borderRadius: "999px",
-    padding: "13px 18px",
-    background: "#111",
-    color: "#fff",
-    fontWeight: 900,
+    padding: "13px 14px",
+    background:
+      "linear-gradient(135deg, #d4af37 0%, #fff1a6 50%, #b8860b 100%)",
+    color: "#08080b",
+    fontWeight: 950,
     cursor: "pointer",
   },
+
   logoutButton: {
-    border: 0,
+    flex: 1,
+    border: "1px solid rgba(255,255,255,0.12)",
     borderRadius: "999px",
-    padding: "13px 18px",
-    background: "#f5f5f7",
-    color: "#111",
-    fontWeight: 900,
+    padding: "13px 14px",
+    background: "rgba(255,255,255,0.10)",
+    color: "#fffaf0",
+    fontWeight: 950,
     cursor: "pointer",
   },
+
   list: {
-    maxWidth: "980px",
-    margin: "28px auto 0",
     display: "grid",
-    gap: "14px",
+    gap: "12px",
+    marginTop: "22px",
   },
+
   sectionHeadline: {
-    fontSize: "28px",
+    fontSize: "24px",
     letterSpacing: "-0.04em",
-    margin: "0 0 4px",
+    margin: "0 0 2px",
+    color: "#fffaf0",
   },
+
   empty: {
-    background: "#fff",
+    padding: "18px",
     borderRadius: "24px",
-    padding: "24px",
-    color: "#6e6e73",
+    background: "rgba(255,255,255,0.09)",
+    color: "rgba(255,250,240,0.75)",
     textAlign: "center" as const,
     fontWeight: 800,
   },
+
   appointmentCard: {
-    background: "#fff",
+    padding: "18px",
     borderRadius: "28px",
-    padding: "24px",
-    boxShadow: "0 12px 40px rgba(0,0,0,0.06)",
+    background: "rgba(255,255,255,0.09)",
+    border: "1px solid rgba(255,255,255,0.10)",
     display: "grid",
-    gridTemplateColumns: "1fr auto",
-    gap: "20px",
+    gap: "14px",
+    backdropFilter: "blur(20px)",
   },
+
+  serviceBadge: {
+    display: "inline-flex",
+    width: "fit-content",
+    padding: "8px 12px",
+    borderRadius: "999px",
+    background: "rgba(212,175,55,0.16)",
+    color: "#fff1a6",
+    fontSize: "12px",
+    fontWeight: 900,
+    marginBottom: "10px",
+  },
+
   appointmentTitle: {
-    fontSize: "22px",
+    display: "block",
+    fontSize: "24px",
+    color: "#fffaf0",
+    letterSpacing: "-0.04em",
   },
+
   appointmentText: {
-    color: "#6e6e73",
+    color: "rgba(255,250,240,0.72)",
     lineHeight: 1.5,
   },
+
   pendingStatus: {
     display: "inline-flex",
+    width: "fit-content",
     padding: "8px 12px",
     borderRadius: "999px",
-    fontWeight: 900,
-    fontSize: "13px",
-    background: "#fef3c7",
-    color: "#92400e",
+    fontWeight: 950,
+    fontSize: "12px",
+    background: "rgba(212,175,55,0.18)",
+    color: "#fff1a6",
   },
+
   confirmedStatus: {
     display: "inline-flex",
+    width: "fit-content",
     padding: "8px 12px",
     borderRadius: "999px",
-    fontWeight: 900,
-    fontSize: "13px",
-    background: "#dcfce7",
-    color: "#166534",
+    fontWeight: 950,
+    fontSize: "12px",
+    background: "rgba(37,211,102,0.18)",
+    color: "#86efac",
   },
+
   declinedStatus: {
     display: "inline-flex",
+    width: "fit-content",
     padding: "8px 12px",
     borderRadius: "999px",
-    fontWeight: 900,
-    fontSize: "13px",
-    background: "#fee2e2",
-    color: "#991b1b",
+    fontWeight: 950,
+    fontSize: "12px",
+    background: "rgba(239,68,68,0.18)",
+    color: "#fecaca",
   },
+
   actions: {
     display: "grid",
+    gridTemplateColumns: "1fr 1fr",
     gap: "8px",
-    minWidth: "150px",
   },
+
   confirm: {
     border: 0,
     borderRadius: "999px",
     padding: "12px 14px",
     background: "#25d366",
     color: "#fff",
-    fontWeight: 900,
+    fontWeight: 950,
     cursor: "pointer",
   },
+
   decline: {
     border: 0,
     borderRadius: "999px",
     padding: "12px 14px",
-    background: "#fee2e2",
-    color: "#991b1b",
-    fontWeight: 900,
+    background: "rgba(239,68,68,0.18)",
+    color: "#fecaca",
+    fontWeight: 950,
     cursor: "pointer",
   },
+
   whatsapp: {
     border: 0,
     borderRadius: "999px",
     padding: "12px 14px",
-    background: "#111",
-    color: "#fff",
-    fontWeight: 900,
+    background: "#fffaf0",
+    color: "#08080b",
+    fontWeight: 950,
     cursor: "pointer",
   },
+
   delete: {
-    border: 0,
+    border: "1px solid rgba(255,255,255,0.12)",
     borderRadius: "999px",
     padding: "12px 14px",
-    background: "#f5f5f7",
-    color: "#6e6e73",
-    fontWeight: 900,
+    background: "rgba(255,255,255,0.10)",
+    color: "rgba(255,250,240,0.78)",
+    fontWeight: 950,
     cursor: "pointer",
   },
+
   overlay: {
     position: "fixed" as const,
     inset: 0,
@@ -601,43 +706,73 @@ const styles = {
     justifyContent: "center",
     padding: "24px",
   },
+
   overlayCard: {
     width: "min(420px, 100%)",
-    background: "#fff",
+    background:
+      "linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.05))",
+    border: "1px solid rgba(255,255,255,0.16)",
     borderRadius: "34px",
     padding: "34px",
     textAlign: "center" as const,
-    boxShadow: "0 30px 100px rgba(0,0,0,0.22)",
+    boxShadow: "0 30px 100px rgba(0,0,0,0.35)",
     animation: "overlayIn 0.35s ease forwards",
   },
+
   overlayIcon: {
     width: "74px",
     height: "74px",
     borderRadius: "50%",
-    background: "#25d366",
-    color: "#fff",
+    background:
+      "linear-gradient(135deg, #d4af37 0%, #fff1a6 55%, #b8860b 100%)",
+    color: "#08080b",
     display: "grid",
     placeItems: "center",
     margin: "0 auto 18px",
     fontSize: "38px",
-    fontWeight: 900,
-    boxShadow: "0 18px 50px rgba(37,211,102,0.35)",
+    fontWeight: 950,
   },
+
   overlayTitle: {
     margin: "0 0 24px",
     fontSize: "30px",
     lineHeight: 1.05,
     letterSpacing: "-0.04em",
+    color: "#fffaf0",
   },
+
   overlayButton: {
     border: 0,
     borderRadius: "999px",
     padding: "15px 28px",
-    background: "#111",
-    color: "#fff",
-    fontWeight: 900,
+    background:
+      "linear-gradient(135deg, #d4af37 0%, #fff1a6 50%, #b8860b 100%)",
+    color: "#08080b",
+    fontWeight: 950,
     fontSize: "16px",
     cursor: "pointer",
     animation: "buttonPulse 1.8s ease-in-out infinite",
+  },
+
+  glowOne: {
+    position: "absolute" as const,
+    width: "420px",
+    height: "420px",
+    borderRadius: "50%",
+    background: "rgba(212,175,55,0.18)",
+    filter: "blur(80px)",
+    top: "-120px",
+    left: "20%",
+  },
+
+  glowTwo: {
+    position: "absolute" as const,
+    width: "360px",
+    height: "360px",
+    borderRadius: "50%",
+    background: "rgba(99,102,241,0.14)",
+    filter: "blur(80px)",
+    bottom: "-90px",
+    right: "18%",
   },
 };

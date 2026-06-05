@@ -36,10 +36,25 @@ export default function LoginPage() {
 
   return (
     <main style={styles.page}>
+      <div style={styles.glowOne}></div>
+      <div style={styles.glowTwo}></div>
+
       <section style={styles.card}>
+        <div style={styles.statusBar}>
+          <Link href="/" style={styles.back}>
+            ← Home
+          </Link>
+
+          <span>SalonFlow</span>
+        </div>
+
+        <div style={styles.appIcon}>◆</div>
+
         <p style={styles.badge}>Barber Login</p>
 
-        <h1 style={styles.title}>Einloggen</h1>
+        <h1 style={styles.title}>
+          Einloggen.
+        </h1>
 
         <p style={styles.text}>
           Melde dich an, um Terminanfragen zu bestätigen, abzulehnen oder zu löschen.
@@ -76,10 +91,6 @@ export default function LoginPage() {
             {isLoading ? "Wird eingeloggt..." : "Einloggen"}
           </button>
         </form>
-
-        <Link href="/" style={styles.back}>
-          ← Zur Startseite
-        </Link>
       </section>
     </main>
   );
@@ -88,74 +99,149 @@ export default function LoginPage() {
 const styles = {
   page: {
     minHeight: "100vh",
-    background: "#f5f5f7",
+    background:
+      "radial-gradient(circle at 50% 0%, rgba(212,175,55,0.18), transparent 34%), linear-gradient(180deg, #08080b 0%, #111116 100%)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    padding: "32px",
+    padding: "24px",
     fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+    color: "#fff",
+    position: "relative" as const,
+    overflow: "hidden",
   },
+
   card: {
-    width: "min(520px, 100%)",
-    background: "#fff",
-    borderRadius: "34px",
-    padding: "34px",
-    boxShadow: "0 24px 80px rgba(0,0,0,0.08)",
+    position: "relative" as const,
+    zIndex: 2,
+    width: "min(430px, 100%)",
+    minHeight: "620px",
+    borderRadius: "46px",
+    background:
+      "linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.05))",
+    border: "1px solid rgba(255,255,255,0.16)",
+    boxShadow: "0 40px 140px rgba(0,0,0,0.45)",
+    padding: "28px",
+    backdropFilter: "blur(30px)",
   },
+
+  statusBar: {
+    display: "flex",
+    justifyContent: "space-between",
+    color: "rgba(255,255,255,0.72)",
+    fontSize: "13px",
+    fontWeight: 800,
+    marginBottom: "28px",
+  },
+
+  back: {
+    color: "rgba(255,255,255,0.72)",
+    textDecoration: "none",
+    fontWeight: 800,
+  },
+
+  appIcon: {
+    width: "66px",
+    height: "66px",
+    borderRadius: "22px",
+    display: "grid",
+    placeItems: "center",
+    background:
+      "linear-gradient(135deg, #d4af37 0%, #fff1a6 55%, #b8860b 100%)",
+    color: "#08080b",
+    fontSize: "30px",
+    fontWeight: 950,
+    marginBottom: "24px",
+  },
+
   badge: {
-    color: "#0071e3",
-    fontWeight: 900,
     margin: 0,
+    color: "#d4af37",
+    fontSize: "13px",
+    fontWeight: 950,
+    letterSpacing: "0.04em",
+    textTransform: "uppercase" as const,
   },
+
   title: {
     fontSize: "52px",
-    letterSpacing: "-0.06em",
-    margin: "10px 0 12px",
+    letterSpacing: "-0.065em",
+    margin: "12px 0 12px",
     lineHeight: 1,
+    color: "#fffaf0",
   },
+
   text: {
-    color: "#6e6e73",
-    fontSize: "18px",
-    lineHeight: 1.5,
+    color: "rgba(255,250,240,0.75)",
+    fontSize: "17px",
+    lineHeight: 1.45,
+    fontWeight: 600,
   },
+
   form: {
     display: "grid",
-    gap: "18px",
+    gap: "16px",
     marginTop: "28px",
   },
+
   label: {
     display: "grid",
     gap: "8px",
-    fontWeight: 800,
+    color: "rgba(255,250,240,0.85)",
+    fontSize: "13px",
+    fontWeight: 900,
   },
+
   input: {
-    padding: "15px 16px",
+    padding: "16px",
     borderRadius: "18px",
-    border: "1px solid rgba(0,0,0,0.12)",
-    fontSize: "16px",
+    border: "1px solid rgba(255,255,255,0.12)",
+    background: "rgba(255,255,255,0.08)",
+    color: "#fffaf0",
+    fontSize: "15px",
+    outline: "none",
   },
+
   message: {
     padding: "14px",
     borderRadius: "18px",
-    background: "#fee2e2",
-    color: "#991b1b",
+    background: "rgba(239,68,68,0.16)",
+    color: "#fecaca",
     fontWeight: 800,
   },
+
   button: {
     padding: "16px 22px",
     borderRadius: "999px",
     border: 0,
-    background: "#111",
-    color: "#fff",
-    fontWeight: 900,
+    background:
+      "linear-gradient(135deg, #d4af37 0%, #fff1a6 50%, #b8860b 100%)",
+    color: "#08080b",
+    fontWeight: 950,
     fontSize: "16px",
     cursor: "pointer",
+    boxShadow: "0 18px 50px rgba(212,175,55,0.25)",
   },
-  back: {
-    display: "inline-block",
-    marginTop: "22px",
-    color: "#0071e3",
-    textDecoration: "none",
-    fontWeight: 800,
+
+  glowOne: {
+    position: "absolute" as const,
+    width: "420px",
+    height: "420px",
+    borderRadius: "50%",
+    background: "rgba(212,175,55,0.18)",
+    filter: "blur(80px)",
+    top: "-120px",
+    left: "20%",
+  },
+
+  glowTwo: {
+    position: "absolute" as const,
+    width: "360px",
+    height: "360px",
+    borderRadius: "50%",
+    background: "rgba(99,102,241,0.14)",
+    filter: "blur(80px)",
+    bottom: "-90px",
+    right: "18%",
   },
 };

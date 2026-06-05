@@ -21,8 +21,8 @@ export default function Home() {
           </h1>
 
           <p style={styles.text}>
-            Frage deinen Termin an, prüfe deinen Status oder öffne das Barber-Dashboard.
-            Alles an einem Ort.
+            Frage deinen Termin an, prüfe deinen Status oder öffne das
+            Barber-Dashboard. Alles an einem Ort.
           </p>
 
           <div style={styles.mainActions}>
@@ -37,28 +37,16 @@ export default function Home() {
         </div>
 
         <div style={styles.quickGrid}>
-          <Link href="/book" style={styles.tile}>
-            <span style={styles.tileIcon}>✂︎</span>
-            <strong>Termin</strong>
-            <small>Anfrage senden</small>
-          </Link>
-
-          <Link href="/status" style={styles.tile}>
-            <span style={styles.tileIcon}>●</span>
-            <strong>Status</strong>
-            <small>Prüfen</small>
-          </Link>
-
-          <Link href="/login" style={styles.tileDark}>
+          <Link href="/barber-entry" style={styles.tileDark}>
             <span style={styles.tileIconGold}>◆</span>
             <strong>Barber</strong>
-            <small>Login</small>
+            <small>Shop Login</small>
           </Link>
 
           <Link href="/settings" style={styles.tile}>
             <span style={styles.tileIcon}>⚙︎</span>
-            <strong>Setup</strong>
-            <small>Einstellungen</small>
+            <strong>Einstellungen</strong>
+            <small>App</small>
           </Link>
         </div>
 
@@ -67,28 +55,15 @@ export default function Home() {
             <span style={styles.smallLabel}>Heute</span>
             <h2 style={styles.cardTitle}>Live Booking Flow</h2>
             <p style={styles.cardText}>
-              Kunden fragen an. Barber bestätigt. Der Status wird automatisch sichtbar.
+              Buche noch heute deinen nächsten perfekten Haarschnitt bei deinem
+              Lieblingsbarber. Nach der Buchung kannst du den Status deiner
+              Anfrage jederzeit in der App verfolgen.
             </p>
           </div>
 
           <div style={styles.progressCircle}>
             <span>✓</span>
           </div>
-        </div>
-
-        <div style={styles.bottomNav}>
-          <Link href="/" style={styles.navItemActive}>
-            Home
-          </Link>
-          <Link href="/book" style={styles.navItem}>
-            Buchen
-          </Link>
-          <Link href="/status" style={styles.navItem}>
-            Status
-          </Link>
-          <Link href="/login" style={styles.navItem}>
-            Login
-          </Link>
         </div>
       </section>
 
@@ -116,7 +91,7 @@ const styles = {
     position: "relative" as const,
     zIndex: 2,
     width: "min(430px, 100%)",
-    minHeight: "860px",
+    minHeight: "760px",
     borderRadius: "46px",
     background:
       "linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.05))",
@@ -252,15 +227,17 @@ const styles = {
     marginTop: "16px",
     borderRadius: "32px",
     padding: "22px",
-    background: "#f5f5f7",
-    color: "#111",
+    background: "rgba(255,255,255,0.09)",
+    border: "1px solid rgba(255,255,255,0.10)",
+    color: "#fff",
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
     gap: "16px",
+    backdropFilter: "blur(20px)",
   },
   smallLabel: {
-    color: "#6e6e73",
+    color: "#fff1d6",
     fontSize: "13px",
     fontWeight: 900,
   },
@@ -268,10 +245,11 @@ const styles = {
     margin: "6px 0 0",
     fontSize: "26px",
     letterSpacing: "-0.04em",
+    color: "#fffaf0",
   },
   cardText: {
     margin: "8px 0 0",
-    color: "#6e6e73",
+    color: "rgba(255,250,240,0.75)",
     fontSize: "14px",
     lineHeight: 1.4,
     fontWeight: 700,
@@ -280,45 +258,15 @@ const styles = {
     width: "62px",
     height: "62px",
     borderRadius: "50%",
-    background: "#25d366",
-    color: "#fff",
+    background:
+      "linear-gradient(135deg, #d4af37 0%, #fff1a6 55%, #b8860b 100%)",
+    color: "#08080b",
     display: "grid",
     placeItems: "center",
     fontSize: "28px",
     fontWeight: 950,
     flex: "0 0 auto",
-  },
-  bottomNav: {
-    position: "absolute" as const,
-    left: "22px",
-    right: "22px",
-    bottom: "18px",
-    padding: "10px",
-    borderRadius: "999px",
-    background: "rgba(255,255,255,0.10)",
-    border: "1px solid rgba(255,255,255,0.12)",
-    display: "grid",
-    gridTemplateColumns: "repeat(4, 1fr)",
-    gap: "6px",
-  },
-  navItem: {
-    padding: "11px 6px",
-    borderRadius: "999px",
-    color: "rgba(255,255,255,0.62)",
-    textDecoration: "none",
-    textAlign: "center" as const,
-    fontSize: "12px",
-    fontWeight: 900,
-  },
-  navItemActive: {
-    padding: "11px 6px",
-    borderRadius: "999px",
-    background: "#fff",
-    color: "#111",
-    textDecoration: "none",
-    textAlign: "center" as const,
-    fontSize: "12px",
-    fontWeight: 950,
+    boxShadow: "0 12px 30px rgba(212,175,55,0.35)",
   },
   glowOne: {
     position: "absolute" as const,
