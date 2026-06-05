@@ -24,3 +24,46 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@keyframes successCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes successPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 18px 50px rgba(37, 211, 102, 0.35);
+  }
+
+  50% {
+    transform: scale(1.06);
+    box-shadow: 0 24px 70px rgba(37, 211, 102, 0.48);
+  }
+
+  100% {
+    transform: scale(1);
+    box-shadow: 0 18px 50px rgba(37, 211, 102, 0.35);
+  }
+}
+
+@keyframes floatGlow {
+  0% {
+    transform: translateY(0) translateX(0);
+  }
+
+  50% {
+    transform: translateY(-24px) translateX(18px);
+  }
+
+  100% {
+    transform: translateY(0) translateX(0);
+  }
+}

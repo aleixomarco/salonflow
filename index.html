@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>SalonFlow – Friseur Terminbuchung</title>
+
+  <meta
+    name="description"
+    content="SalonFlow ist eine moderne Terminbuchungs-App für Friseursalons mit WhatsApp-Terminanfrage."
+  />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+  <header class="app-header">
+    <a href="#" class="brand">
+      <span class="brand-mark">S</span>
+      <span>SalonFlow</span>
+    </a>
+
+    <nav class="nav">
+      <a href="#booking">Termin buchen</a>
+      <a href="#vorteile">Vorteile</a>
+      <a href="#dashboard">Salon-Dashboard</a>
+      <a href="#loyalty">Treuekarte</a>
+    </nav>
+
+    <a href="#booking" class="header-cta">Jetzt buchen</a>
+  </header>
+
+  <main>
+
+    <section class="hero">
+      <div class="container hero-grid">
+
+        <div class="hero-content">
+          <div class="badge">
+            <span></span>
+            Digitale Terminbuchung für moderne Friseursalons
+          </div>
+
+          <h1>
+            Termine buchen.
+            <span>Direkt per WhatsApp.</span>
+            Einfacher für alle.
+          </h1>
+
+          <p>
+            SalonFlow macht aus deiner Website ein modernes Buchungssystem.
+            Kunden wählen Leistung, Datum und Uhrzeit — und senden die Anfrage
+            direkt per WhatsApp an den Salon.
+          </p>
+
+          <div class="hero-actions">
+            <a href="#booking" class="btn btn-primary">Termin anfragen</a>
+            <a href="#vorteile" class="btn btn-secondary">Mehr erfahren</a>
+          </div>
+        </div>
+
+        <div class="phone-card">
+          <div class="phone">
+            <div class="phone-top"></div>
+
+            <div class="phone-screen">
+              <div class="mini-title">Neue Terminanfrage</div>
+              <h3>Haarschnitt</h3>
+              <p>Freitag, 14:30 Uhr</p>
+
+              <div class="status-row">
+                <span>WhatsApp bereit</span>
+                <strong>1 Klick</strong>
+              </div>
+
+              <div class="hair-card">
+                <span>Kunde</span>
+                <strong>Maria · +49 176 12345678</strong>
+              </div>
+
+              <div class="hair-card">
+                <span>Leistung</span>
+                <strong>Haarschnitt · Wunschzeit 14:30</strong>
+              </div>
+
+              <button>Termin bestätigen</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="section" id="booking">
+      <div class="container">
+
+        <div class="section-title">
+          <span>Online-Terminbuchung</span>
+          <h2>Termin per WhatsApp anfragen.</h2>
+          <p>
+            Fülle kurz deine Daten aus. Danach öffnet sich WhatsApp automatisch
+            mit deiner fertigen Terminanfrage an den Friseur.
+          </p>
+        </div>
+
+        <div class="app-grid">
+
+          <form class="panel form-panel" id="whatsappBookingForm">
+
+            <label>
+              Name
+              <input type="text" id="name" placeholder="Dein Name" required />
+            </label>
+
+            <label>
+              Telefon
+              <input type="tel" id="phone" placeholder="+49 176 12345678" required />
+            </label>
+
+            <label>
+              Leistung
+              <select id="service" required>
+                <option value="">Bitte auswählen</option>
+                <option>Haarschnitt Kinder</option>
+                <option>Haarschnitt Herren</option>
+              </select>
+            </label>
+
+            <div class="form-row two">
+              <label>
+                Datum
+                <input type="date" id="date" required />
+              </label>
+
+              <label>
+                Uhrzeit
+                <select id="time" required>
+                  <option value="">Bitte zuerst Datum wählen</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="notice">
+              <strong>Hinweis:</strong>
+              Deine Anfrage wird per WhatsApp an den Friseur gesendet.
+              Der Termin ist erst bestätigt, wenn Badr dir antwortet.
+            </div>
+
+            <button type="submit" class="btn btn-primary full">
+              Termin per WhatsApp anfragen
+            </button>
+
+          </form>
+
+          <aside class="panel summary-panel">
+            <h3>So funktioniert es</h3>
+
+            <div class="summary-box">
+              <span>Schritt 1</span>
+              <strong>Daten eingeben</strong>
+            </div>
+
+            <div class="summary-box">
+              <span>Schritt 2</span>
+              <strong>Freie Uhrzeit wählen</strong>
+            </div>
+
+            <div class="summary-box">
+              <span>Schritt 3</span>
+              <strong>WhatsApp öffnet sich</strong>
+            </div>
+
+            <div class="summary-box">
+              <span>Schritt 4</span>
+              <strong>Salon bestätigt Termin</strong>
+            </div>
+
+            <p>
+              Es werden nur offene Termine angezeigt. Bereits geplante Termine
+              kannst du in der JavaScript-Datei sperren.
+            </p>
+          </aside>
+
+        </div>
+
+      </div>
+    </section>
+
+    <section class="section soft" id="vorteile">
+      <div class="container">
+
+        <div class="section-title">
+          <span>Warum es funktioniert</span>
+          <h2>Mehr Terminanfragen ohne komplizierte App.</h2>
+          <p>
+            Viele Kunden möchten nicht anrufen. Mit SalonFlow können sie direkt
+            auf der Website eine Anfrage starten und per WhatsApp absenden.
+          </p>
+        </div>
+
+        <div class="dashboard-layout">
+
+          <div class="metric-card">
+            <span>Für Kunden</span>
+            <strong>Einfach</strong>
+          </div>
+
+          <div class="metric-card">
+            <span>Für Salons</span>
+            <strong>Schnell</strong>
+          </div>
+
+          <div class="metric-card">
+            <span>Bestätigung</span>
+            <strong>Manuell</strong>
+          </div>
+
+          <div class="metric-card">
+            <span>Kontakt</span>
+            <strong>WhatsApp</strong>
+          </div>
+
+        </div>
+
+        <div class="dashboard-columns">
+
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Vorteile für Kunden</h3>
+            </div>
+
+            <div class="feature-list">
+              <div>
+                <strong>Kein Anruf nötig</strong>
+                <p>Kunden können bequem online ihre Anfrage vorbereiten.</p>
+              </div>
+
+              <div>
+                <strong>Schnelle Kommunikation</strong>
+                <p>Die Anfrage landet direkt in WhatsApp.</p>
+              </div>
+
+              <div>
+                <strong>Klare Angaben</strong>
+                <p>Name, Telefon, Leistung, Datum und Uhrzeit sind direkt enthalten.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Vorteile für Friseure</h3>
+            </div>
+
+            <div class="feature-list">
+              <div>
+                <strong>Weniger Telefonstress</strong>
+                <p>Der Salon bekommt strukturierte Anfragen statt unklarer Nachrichten.</p>
+              </div>
+
+              <div>
+                <strong>Bessere Planung</strong>
+                <p>Der Friseur sieht sofort, welche Leistung gewünscht ist.</p>
+              </div>
+
+              <div>
+                <strong>Einfache Bestätigung</strong>
+                <p>Der Salon kann direkt per WhatsApp antworten und bestätigen.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <section class="section" id="dashboard">
+      <div class="container">
+
+        <div class="section-title">
+          <span>Salon-Dashboard</span>
+          <h2>Später kann daraus eine echte App werden.</h2>
+          <p>
+            Die WhatsApp-Buchung ist der einfache Start. Danach kann die App
+            mit Login, Kalender, Datenbank, Erinnerungen und Anzahlungen erweitert werden.
+          </p>
+        </div>
+
+        <div class="dashboard-layout">
+
+          <div class="metric-card">
+            <span>Terminanfragen</span>
+            <strong>WhatsApp</strong>
+          </div>
+
+          <div class="metric-card">
+            <span>Kalender</span>
+            <strong>Optional</strong>
+          </div>
+
+          <div class="metric-card">
+            <span>Erinnerungen</span>
+            <strong>Später</strong>
+          </div>
+
+          <div class="metric-card">
+            <span>Anzahlungen</span>
+            <strong>Stripe</strong>
+          </div>
+
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Mögliche Erweiterungen</h3>
+          </div>
+
+          <div class="feature-list">
+            <div>
+              <strong>Echter Kalender</strong>
+              <p>Termine können automatisch in einem Salon-Kalender gespeichert werden.</p>
+            </div>
+
+            <div>
+              <strong>Automatische Erinnerungen</strong>
+              <p>Kunden können 24 Stunden vorher per E-Mail, SMS oder WhatsApp erinnert werden.</p>
+            </div>
+
+            <div>
+              <strong>Anzahlungen</strong>
+              <p>Für größere Leistungen kann später eine Anzahlung integriert werden.</p>
+            </div>
+
+            <div>
+              <strong>Kundenprofile</strong>
+              <p>Der Salon kann langfristig Haarhistorie, Wünsche und Termine speichern.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="section soft" id="loyalty">
+      <div class="container loyalty-grid">
+
+        <div>
+          <div class="section-title left">
+            <span>Kundenbindung</span>
+            <h2>Aus einer Anfrage wird ein Stammkunde.</h2>
+            <p>
+              Später kann SalonFlow um Treuekarten, Geburtstagsgutscheine,
+              Erinnerungen und Produktempfehlungen erweitert werden.
+            </p>
+          </div>
+
+          <div class="feature-list">
+            <div>
+              <strong>Digitale Stempelkarte</strong>
+              <p>Nach mehreren Besuchen erhält der Kunde einen Rabatt oder ein Treatment.</p>
+            </div>
+
+            <div>
+              <strong>Geburtstagsgutschein</strong>
+              <p>Automatischer Gutschein zum Geburtstag.</p>
+            </div>
+
+            <div>
+              <strong>Erinnerung</strong>
+              <p>Nach mehreren Wochen kann automatisch eine Wiederbuchung vorgeschlagen werden.</p>
+            </div>
+
+            <div>
+              <strong>Empfehlungsprogramm</strong>
+              <p>Kunden erhalten Guthaben, wenn sie Freunde empfehlen.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="loyalty-card">
+          <h3>Meine Treuekarte</h3>
+          <p>SalonFlow Hair Studio</p>
+
+          <div class="stamps">
+            <span class="filled">✓</span>
+            <span class="filled">✓</span>
+            <span class="filled">✓</span>
+            <span></span>
+            <span></span>
+          </div>
+
+          <div class="coupon">
+            <span>Geburtstagsgutschein</span>
+            <strong>10 % Rabatt</strong>
+          </div>
+
+          <div class="coupon">
+            <span>Empfehlung</span>
+            <strong>Freund empfehlen und Guthaben sichern</strong>
+          </div>
+
+          <a href="#booking" class="btn btn-primary full">
+            Nächsten Termin anfragen
+          </a>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="final-section">
+      <div class="container">
+        <div class="final-box">
+          <h2>Bereit für einfache Terminbuchung?</h2>
+          <p>
+            Starte mit einer WhatsApp-Terminanfrage direkt auf deiner Website.
+            Später kann daraus Schritt für Schritt eine vollständige Friseur-App werden.
+          </p>
+
+          <div class="hero-actions">
+            <a href="#booking" class="btn btn-primary">Termin anfragen</a>
+            <a href="#vorteile" class="btn btn-secondary">Vorteile ansehen</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
