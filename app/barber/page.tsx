@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 type AppointmentStatus = "pending" | "confirmed" | "declined" | "cancelled";
@@ -28,6 +29,8 @@ type AppointmentFromSupabase = {
 };
 
 export default function BarberPage() {
+  const router = useRouter();
+
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdatingId, setIsUpdatingId] = useState<number | null>(null);
@@ -35,8 +38,19 @@ export default function BarberPage() {
   const [showDeleteOverlay, setShowDeleteOverlay] = useState(false);
 
   useEffect(() => {
-    loadAppointments();
-  }, []);
+    async function checkLogin() {
+      const { data } = await supabase.auth.getSession();
+
+      if (!data.session) {
+        router.push("/login");
+        return;
+      }
+
+      loadAppointments();
+    }
+
+    checkLogin();
+  }, [router]);
 
   async function loadAppointments() {
     setIsLoading(true);
@@ -117,6 +131,11 @@ export default function BarberPage() {
 
     await loadAppointments();
     setShowDeleteOverlay(true);
+  }
+
+  async function handleLogout() {
+    await supabase.auth.signOut();
+    router.push("/login");
   }
 
   function cleanPhoneNumber(phone: string) {
@@ -246,9 +265,15 @@ Bitte schreib uns kurz, damit wir gemeinsam eine passende Alternative finden.`
 
         {message && <div style={styles.messageBox}>{message}</div>}
 
-        <button style={styles.refreshButton} onClick={loadAppointments}>
-          Neu laden
-        </button>
+        <div style={styles.headerActions}>
+          <button style={styles.refreshButton} onClick={loadAppointments}>
+            Neu laden
+          </button>
+
+          <button style={styles.logoutButton} onClick={handleLogout}>
+            Ausloggen
+          </button>
+        </div>
       </section>
 
       <section style={styles.list}>
@@ -303,9 +328,7 @@ Bitte schreib uns kurz, damit wir gemeinsam eine passende Alternative finden.`
                   disabled={isUpdatingId === appointment.id}
                   onClick={() => deleteAppointment(appointment.id)}
                 >
-                  {isUpdatingId === appointment.id
-                    ? "Löscht..."
-                    : "Löschen"}
+                  {isUpdatingId === appointment.id ? "Löscht..." : "Löschen"}
                 </button>
               </div>
             </article>
@@ -365,9 +388,7 @@ Bitte schreib uns kurz, damit wir gemeinsam eine passende Alternative finden.`
                     disabled={isUpdatingId === appointment.id}
                     onClick={() => deleteAppointment(appointment.id)}
                   >
-                    {isUpdatingId === appointment.id
-                      ? "Löscht..."
-                      : "Löschen"}
+                    {isUpdatingId === appointment.id ? "Löscht..." : "Löschen"}
                   </button>
                 </div>
               </article>
@@ -441,13 +462,27 @@ const styles = {
     color: "#0c5f2a",
     fontWeight: 800,
   },
-  refreshButton: {
+  headerActions: {
+    display: "flex",
+    gap: "12px",
+    flexWrap: "wrap" as const,
     marginTop: "20px",
+  },
+  refreshButton: {
     border: 0,
     borderRadius: "999px",
     padding: "13px 18px",
     background: "#111",
     color: "#fff",
+    fontWeight: 900,
+    cursor: "pointer",
+  },
+  logoutButton: {
+    border: 0,
+    borderRadius: "999px",
+    padding: "13px 18px",
+    background: "#f5f5f7",
+    color: "#111",
     fontWeight: 900,
     cursor: "pointer",
   },
