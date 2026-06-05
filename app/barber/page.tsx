@@ -32,6 +32,7 @@ export default function BarberPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdatingId, setIsUpdatingId] = useState<number | null>(null);
   const [message, setMessage] = useState("");
+  const [showDeleteOverlay, setShowDeleteOverlay] = useState(false);
 
   useEffect(() => {
     loadAppointments();
@@ -99,22 +100,23 @@ export default function BarberPage() {
   }
 
   async function deleteAppointment(id: number) {
-    const confirmed = confirm("Möchtest du diese Anfrage wirklich löschen?");
-
-    if (!confirmed) return;
+    setIsUpdatingId(id);
+    setMessage("");
 
     const { error } = await supabase
       .from("appointments")
       .delete()
       .eq("id", id);
 
+    setIsUpdatingId(null);
+
     if (error) {
       setMessage("Fehler beim Löschen: " + error.message);
       return;
     }
 
-    setMessage("Anfrage wurde gelöscht.");
     await loadAppointments();
+    setShowDeleteOverlay(true);
   }
 
   function cleanPhoneNumber(phone: string) {
@@ -183,6 +185,23 @@ Bitte schreib uns kurz, damit wir gemeinsam eine passende Alternative finden.`
 
   return (
     <main style={styles.page}>
+      {showDeleteOverlay && (
+        <div style={styles.overlay}>
+          <div style={styles.overlayCard}>
+            <div style={styles.overlayIcon}>✓</div>
+
+            <h2 style={styles.overlayTitle}>Anfrage erfolgreich gelöscht.</h2>
+
+            <button
+              style={styles.overlayButton}
+              onClick={() => setShowDeleteOverlay(false)}
+            >
+              Okay
+            </button>
+          </div>
+        </div>
+      )}
+
       <div style={styles.top}>
         <Link href="/" style={styles.back}>
           ← Zurück
@@ -281,9 +300,12 @@ Bitte schreib uns kurz, damit wir gemeinsam eine passende Alternative finden.`
 
                 <button
                   style={styles.delete}
+                  disabled={isUpdatingId === appointment.id}
                   onClick={() => deleteAppointment(appointment.id)}
                 >
-                  Löschen
+                  {isUpdatingId === appointment.id
+                    ? "Löscht..."
+                    : "Löschen"}
                 </button>
               </div>
             </article>
@@ -340,9 +362,12 @@ Bitte schreib uns kurz, damit wir gemeinsam eine passende Alternative finden.`
 
                   <button
                     style={styles.delete}
+                    disabled={isUpdatingId === appointment.id}
                     onClick={() => deleteAppointment(appointment.id)}
                   >
-                    Löschen
+                    {isUpdatingId === appointment.id
+                      ? "Löscht..."
+                      : "Löschen"}
                   </button>
                 </div>
               </article>
@@ -528,5 +553,56 @@ const styles = {
     color: "#6e6e73",
     fontWeight: 900,
     cursor: "pointer",
+  },
+  overlay: {
+    position: "fixed" as const,
+    inset: 0,
+    zIndex: 9999,
+    background: "rgba(0,0,0,0.35)",
+    backdropFilter: "blur(16px)",
+    WebkitBackdropFilter: "blur(16px)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "24px",
+  },
+  overlayCard: {
+    width: "min(420px, 100%)",
+    background: "#fff",
+    borderRadius: "34px",
+    padding: "34px",
+    textAlign: "center" as const,
+    boxShadow: "0 30px 100px rgba(0,0,0,0.22)",
+    animation: "overlayIn 0.35s ease forwards",
+  },
+  overlayIcon: {
+    width: "74px",
+    height: "74px",
+    borderRadius: "50%",
+    background: "#25d366",
+    color: "#fff",
+    display: "grid",
+    placeItems: "center",
+    margin: "0 auto 18px",
+    fontSize: "38px",
+    fontWeight: 900,
+    boxShadow: "0 18px 50px rgba(37,211,102,0.35)",
+  },
+  overlayTitle: {
+    margin: "0 0 24px",
+    fontSize: "30px",
+    lineHeight: 1.05,
+    letterSpacing: "-0.04em",
+  },
+  overlayButton: {
+    border: 0,
+    borderRadius: "999px",
+    padding: "15px 28px",
+    background: "#111",
+    color: "#fff",
+    fontWeight: 900,
+    fontSize: "16px",
+    cursor: "pointer",
+    animation: "buttonPulse 1.8s ease-in-out infinite",
   },
 };
